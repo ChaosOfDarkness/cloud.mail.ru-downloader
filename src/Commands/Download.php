@@ -82,7 +82,7 @@ class Download extends Command
 
         $logger->notice('Started at {time}', ['time' => date('H:i:s d-m-Y')]);
 
-        $logger->notice('Requesting files from the cloud.');
+        $logger->info('Requesting files from the cloud.');
 
         $cloud = new CloudAPI(
             $this->login,
@@ -189,7 +189,7 @@ class Download extends Command
 
         $files = array_filter($files, function (File $file) use ($logger, $limit) {
             if ($file->getSize() > $this->maxSize) {
-                $logger->notice(
+                $logger->info(
                     'File {file} is skipped because it is bigger than {limit}.',
                     [
                         'file' => $file->getPath(),
