@@ -281,8 +281,14 @@ class API
         }
     }
 
-    public function download(File $file, $destination)
+    public function download(File $file, $destination, $rewrite = false)
     {
+        $originalPath = $destination . '/' . $file->getPath();
+
+        if (!$rewrite && file_exists($originalPath) && filesize($originalPath) === $file->getSize()) {
+            return;
+        }
+
         $temporaryFilePath = $this->getTemporaryFilePath($file, $destination);
 
         $this->ensureDirectoryStructureFor($temporaryFilePath);
@@ -294,7 +300,7 @@ class API
             ]
         );
 
-        rename($temporaryFilePath, $destination . '/' . $file->getPath());
+        rename($temporaryFilePath, $originalPath);
     }
 
     /**

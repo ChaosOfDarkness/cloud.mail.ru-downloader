@@ -24,6 +24,7 @@ class Download extends Command
     private $target;
     private $source;
     private $maxSize;
+    private $rewrite;
 
     protected function configure()
     {
@@ -36,6 +37,11 @@ class Download extends Command
                 'max-size', 'm',
                 InputOption::VALUE_OPTIONAL,
                 'Skip files bigger than this amount of megabytes'
+            )
+            ->addOption(
+                'rewrite', 'r',
+                InputOption::VALUE_NONE,
+                'Download files that already exists on a disk and have the same size anyway'
             );
     }
 
@@ -132,6 +138,7 @@ class Download extends Command
         $this->target = trim($input->getOption('target'));
         $this->source = trim($input->getOption('source'));
         $this->maxSize = (int)$input->getOption('max-size') * 1024 * 1024;
+        $this->rewrite = (bool)$input->getOption('rewrite');
 
         $this->validateParams();
     }
@@ -284,7 +291,11 @@ class Download extends Command
             $progress->clear();
             $progress->display();
 
-            $cloud->download($file, $this->target);
+            $cloud->download($file, $this->target, $this->rewrite);
+
+            // A little delay, so progress won't update too fast when we are downloading a bunch of small files
+            // Maybe it is not the best idea, but i'll keep it for now
+            usleep(100000);
 
             $progress->clear();
             $progress->advance($file->getSize());
